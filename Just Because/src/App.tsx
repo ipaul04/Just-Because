@@ -86,7 +86,7 @@ export default function App() {
 
   return (
     <>
-      <BackgroundSlideshow images={slideshowImages} />
+      {page !== 'home' && <BackgroundSlideshow images={slideshowImages} />}
       {(() => {
         switch (page) {
           case 'welcome':

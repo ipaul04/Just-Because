@@ -52,6 +52,7 @@ export default function HomePage({ user, setPage, handleLogout, onAddToCart }: H
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-pink-100 text-center p-8"
     >
       <h1 className="text-5xl font-bold mb-6">Welcome, {user?.username}!</h1>
       <p className="text-lg text-gray-600 mb-8 max-w-xl">
