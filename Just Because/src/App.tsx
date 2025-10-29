@@ -3,6 +3,7 @@ import LoginPage from './LoginPage';
 import HomePage from './HomePage';
 import SurveyPage from './SurveyPage';
 import WelcomePage from './WelcomePage';
+import BackgroundSlideshow from './BackgroundSlideshow';
 
 interface User {
   username: string;
@@ -38,6 +39,13 @@ interface SurveyPageProps {
   surveyData: SurveyEntry[];
   setPage: (pageName: string) => void;
 }
+
+const slideshowImages = [
+  '/slideshow/initial.png',
+  '/slideshow/image1.png',
+  '/slideshow/image2.png',
+  '/slideshow/image3.png',
+];
 
 export default function App() {
   const [page, setPage] = useState('welcome');
@@ -77,8 +85,9 @@ export default function App() {
   };
 
   return (
-    <>{
-      (() => {
+    <>
+      <BackgroundSlideshow images={slideshowImages} />
+      {(() => {
         switch (page) {
           case 'welcome':
             return <WelcomePage setPage={setPage} />;
@@ -91,7 +100,7 @@ export default function App() {
           default:
             return <LoginPage handleLogin={handleLogin} />;
         }
-      })()
-    }</>
+      })()}
+    </>
   );
 }

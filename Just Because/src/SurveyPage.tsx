@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import BackgroundSlideshow from './BackgroundSlideshow';
 
 interface SurveyEntry {
   id: number;
@@ -25,7 +24,7 @@ interface Question {
 const surveyQuestions: Question[] = [
   {
     id: 'feeling',
-    question: 'How are you feeling today?',
+    question: "How are you feeling today?",
     type: 'radio',
     options: [
       { value: 'Happy', label: 'Happy' },
@@ -37,7 +36,7 @@ const surveyQuestions: Question[] = [
   },
   {
     id: 'smile',
-    question: 'What\'s one thing that made you smile?',
+    question: "What's one thing that made you smile?",
     type: 'radio',
     options: [
       { value: 'A good joke', label: 'A good joke' },
@@ -49,15 +48,9 @@ const surveyQuestions: Question[] = [
   },
   {
     id: 'message',
-    question: 'Anything you\'d like to share?',
+    question: "Anything you'd like to share?",
     type: 'text',
   },
-];
-
-const slideshowImages = [
-  '/slideshow/image1.png', // Placeholder - User should replace with actual images in public/slideshow
-  '/slideshow/image2.png', // Placeholder
-  '/slideshow/image3.png', // Placeholder
 ];
 
 export default function SurveyPage({ handleSurveySubmit, surveyData, setPage }: SurveyPageProps) {
@@ -89,10 +82,12 @@ export default function SurveyPage({ handleSurveySubmit, surveyData, setPage }: 
     try {
       await saveSurveyResponseToDatabase(responses);
       handleSurveySubmit(e, setNotification);
-      setPage('home'); // Navigate to home page after survey submission
+      // setPage('home'); // Removed: Navigation handled by handleSurveySubmit prop
     } catch (error) {
       console.error('Failed to submit survey:', error);
       setNotification('Failed to submit survey. Please try again.');
+    } finally {
+      setTimeout(() => setNotification(''), 3000); // Clear notification after 3 seconds
     }
   };
 
@@ -119,7 +114,6 @@ export default function SurveyPage({ handleSurveySubmit, surveyData, setPage }: 
       transition={{ duration: 0.5 }}
       className="relative flex flex-col items-center justify-center min-h-screen p-8"
     >
-      <BackgroundSlideshow images={slideshowImages} />
       <div className="relative z-10 bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg">
         <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Quick Survey</h2>
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">

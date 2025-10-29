@@ -11,7 +11,7 @@ export default function WelcomePage({ setPage }: WelcomePageProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="relative flex flex-col items-center justify-center min-h-screen text-center p-8"
+      className="flex flex-col items-center justify-center min-h-screen text-center p-8"
     >
       <div className="relative z-10 flex flex-col items-center justify-center">
         <img src="/logo.png" alt="Main Logo" className="w-64 h-64 object-contain mb-8" />
