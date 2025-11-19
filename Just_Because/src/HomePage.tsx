@@ -1,13 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+interface User {
+  username: string;
+  email: string;
+  surveyResponses?: any;
+  orderHistory: any[];
+  createdAt: string;
+}
+
 interface HomePageProps {
   setPage: (pageName: string) => void;
   onSelectBox: (boxType: string) => void;
   cartCount: number;
+  user: User | null;
+  onLogout: () => void;
 }
 
-export default function HomePage({ setPage, onSelectBox, cartCount }: HomePageProps) {
+export default function HomePage({ setPage, onSelectBox, cartCount, user, onLogout }: HomePageProps) {
   const handleBoxClick = (boxType: string) => {
     onSelectBox(boxType);
     setPage('customize');
@@ -22,19 +32,15 @@ export default function HomePage({ setPage, onSelectBox, cartCount }: HomePagePr
             <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
             <h1 className="text-2xl font-bold text-gray-800">Just Because</h1>
           </div>
-          <div className="flex space-x-6">
-            <button
-              onClick={() => setPage('survey')}
-              className="text-gray-700 hover:text-pink-500 font-semibold transition"
-            >
-              Survey
-            </button>
-            <button
-              onClick={() => setPage('login')}
-              className="text-gray-700 hover:text-pink-500 font-semibold transition"
-            >
-              Login
-            </button>
+          <div className="flex items-center space-x-6">
+            {user && !user.surveyResponses && (
+              <button
+                onClick={() => setPage('survey')}
+                className="text-gray-700 hover:text-pink-500 font-semibold transition"
+              >
+                Take Survey
+              </button>
+            )}
             <button
               onClick={() => setPage('cart')}
               className="text-gray-700 hover:text-pink-500 font-semibold transition relative"
@@ -46,6 +52,26 @@ export default function HomePage({ setPage, onSelectBox, cartCount }: HomePagePr
                 </span>
               )}
             </button>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-gray-700 font-semibold">
+                  Welcome, {user.username}!
+                </span>
+                <button
+                  onClick={onLogout}
+                  className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg font-semibold transition"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setPage('login')}
+                className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg font-semibold transition"
+              >
+                Login
+              </button>
+            )}
           </div>
         </div>
       </nav>

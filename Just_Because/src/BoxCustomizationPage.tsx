@@ -8,10 +8,19 @@ interface BoxItem {
   included: boolean;
 }
 
+interface SurveyResponses {
+  style: string;
+  productTypes: string[];
+  interests: string[];
+  priceRange: string;
+  occasion: string;
+}
+
 interface BoxCustomizationPageProps {
   boxType: string;
   setPage: (pageName: string) => void;
   onAddToCart: (box: CustomBox) => void;
+  userSurvey?: SurveyResponses;
 }
 
 interface CustomBox {
@@ -104,7 +113,7 @@ const boxColors: Record<string, {
   },
 };
 
-export default function BoxCustomizationPage({ boxType, setPage, onAddToCart }: BoxCustomizationPageProps) {
+export default function BoxCustomizationPage({ boxType, setPage, onAddToCart, userSurvey }: BoxCustomizationPageProps) {
   const [items, setItems] = useState<BoxItem[]>([]);
 
   useEffect(() => {
@@ -118,10 +127,68 @@ export default function BoxCustomizationPage({ boxType, setPage, onAddToCart }: 
     ));
   };
 
+  const BASE_PRICE = 49.99;
+  const BASE_ITEMS = 3;
+
   const calculateTotal = () => {
-    return items
-      .filter(item => item.included)
-      .reduce((sum, item) => sum + item.price, 0);
+    const includedItems = items.filter(item => item.included);
+    const itemCount = includedItems.length;
+
+    if (itemCount === 0) return 0;
+    if (itemCount <= BASE_ITEMS) return BASE_PRICE;
+
+    // For more than 3 items: $49.99 + sum of additional items' prices
+    const additionalItems = includedItems.slice(BASE_ITEMS);
+    const additionalCost = additionalItems.reduce((sum, item) => sum + item.price, 0);
+    return BASE_PRICE + additionalCost;
+  };
+
+  const isRecommended = (item: BoxItem): boolean => {
+    if (!userSurvey) return false;
+
+    const itemName = item.name.toLowerCase();
+    const { style, productTypes, interests } = userSurvey;
+
+    // Match based on style
+    if (style === 'luxury' && (itemName.includes('premium') || itemName.includes('luxurious') || itemName.includes('silk') || itemName.includes('gold'))) {
+      return true;
+    }
+    if (style === 'casual' && (itemName.includes('coffee') || itemName.includes('snack') || itemName.includes('mug'))) {
+      return true;
+    }
+    if (style === 'elegant' && (itemName.includes('bracelet') || itemName.includes('watch') || itemName.includes('journal'))) {
+      return true;
+    }
+
+    // Match based on product types
+    if (productTypes.includes('beauty') && (itemName.includes('bath') || itemName.includes('candle') || itemName.includes('aromatherapy') || itemName.includes('soap') || itemName.includes('grooming'))) {
+      return true;
+    }
+    if (productTypes.includes('food') && (itemName.includes('chocolate') || itemName.includes('coffee') || itemName.includes('jerky') || itemName.includes('beer') || itemName.includes('snack') || itemName.includes('popcorn') || itemName.includes('tea'))) {
+      return true;
+    }
+    if (productTypes.includes('accessories') && (itemName.includes('bracelet') || itemName.includes('wallet') || itemName.includes('watch') || itemName.includes('earbuds') || itemName.includes('organizer'))) {
+      return true;
+    }
+    if (productTypes.includes('home') && (itemName.includes('candle') || itemName.includes('frame') || itemName.includes('mug'))) {
+      return true;
+    }
+
+    // Match based on interests
+    if (interests.includes('wellness') && (itemName.includes('aromatherapy') || itemName.includes('tea') || itemName.includes('bath') || itemName.includes('sleep'))) {
+      return true;
+    }
+    if (interests.includes('fashion') && (itemName.includes('bracelet') || itemName.includes('watch') || itemName.includes('mask'))) {
+      return true;
+    }
+    if (interests.includes('tech') && (itemName.includes('earbuds') || itemName.includes('organizer'))) {
+      return true;
+    }
+    if (interests.includes('food') && (itemName.includes('chocolate') || itemName.includes('coffee') || itemName.includes('gourmet') || itemName.includes('wine'))) {
+      return true;
+    }
+
+    return false;
   };
 
   const handleAddToCart = () => {
@@ -174,6 +241,14 @@ export default function BoxCustomizationPage({ boxType, setPage, onAddToCart }: 
               : ' Default items are pre-selected, but you can customize as you wish!'}
           </p>
 
+          {userSurvey && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800">
+                ✨ Items marked with a star are recommended based on your preferences!
+              </p>
+            </div>
+          )}
+
           {/* Summary Bar */}
           <div className={`${color.bgGradient} rounded-xl p-4 mb-6`}>
             <div className="flex justify-between items-center">
@@ -181,6 +256,15 @@ export default function BoxCustomizationPage({ boxType, setPage, onAddToCart }: 
                 <span className="text-gray-700 font-semibold">
                   {includedCount} item{includedCount !== 1 ? 's' : ''} selected
                 </span>
+                {includedCount <= BASE_ITEMS ? (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Base price for up to {BASE_ITEMS} items: ${BASE_PRICE.toFixed(2)}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Base: ${BASE_PRICE.toFixed(2)} + {includedCount - BASE_ITEMS} extra item{includedCount - BASE_ITEMS !== 1 ? 's' : ''}
+                  </p>
+                )}
               </div>
               <div className="text-2xl font-bold text-gray-800">
                 Total: ${calculateTotal().toFixed(2)}
@@ -190,36 +274,47 @@ export default function BoxCustomizationPage({ boxType, setPage, onAddToCart }: 
 
           {/* Items Checklist */}
           <div className="space-y-4 mb-8">
-            {items.map((item) => (
-              <motion.div
-                key={item.id}
-                whileHover={{ scale: 1.02 }}
-                className={`border-2 rounded-xl p-4 cursor-pointer transition ${
-                  item.included
-                    ? `${color.borderActiveClass} ${color.bgActiveClass}`
-                    : `${color.borderClass} bg-white`
-                }`}
-                onClick={() => toggleItem(item.id)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <input
-                      type="checkbox"
-                      checked={item.included}
-                      onChange={() => toggleItem(item.id)}
-                      className={`w-6 h-6 rounded cursor-pointer ${color.accentClass}`}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
+            {items.map((item) => {
+              const recommended = isRecommended(item);
+              return (
+                <motion.div
+                  key={item.id}
+                  whileHover={{ scale: 1.02 }}
+                  className={`border-2 rounded-xl p-4 cursor-pointer transition ${
+                    item.included
+                      ? `${color.borderActiveClass} ${color.bgActiveClass}`
+                      : recommended
+                      ? 'border-green-300 bg-green-50'
+                      : `${color.borderClass} bg-white`
+                  }`}
+                  onClick={() => toggleItem(item.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <input
+                        type="checkbox"
+                        checked={item.included}
+                        onChange={() => toggleItem(item.id)}
+                        className={`w-6 h-6 rounded cursor-pointer ${color.accentClass}`}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                          {item.name}
+                          {recommended && <span className="text-yellow-500">⭐</span>}
+                        </h3>
+                        {recommended && (
+                          <p className="text-xs text-green-600 mt-1">Recommended for you</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-lg font-bold text-gray-700">
+                      ${item.price.toFixed(2)}
                     </div>
                   </div>
-                  <div className="text-lg font-bold text-gray-700">
-                    ${item.price.toFixed(2)}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* Action Buttons */}

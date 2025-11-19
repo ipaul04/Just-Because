@@ -15,11 +15,21 @@ interface CustomBox {
   totalPrice: number;
 }
 
+interface Order {
+  orderId: string;
+  timestamp: string;
+  boxes: CustomBox[];
+  totalAmount: number;
+  tax: number;
+  grandTotal: number;
+}
+
 interface CartPageProps {
   cart: CustomBox[];
   setPage: (pageName: string) => void;
   onRemoveFromCart: (boxId: number) => void;
   onClearCart: () => void;
+  onCheckout: (order: Order) => void;
 }
 
 const boxTitles: Record<string, string> = {
@@ -28,7 +38,7 @@ const boxTitles: Record<string, string> = {
   'build-a-box': 'Build-A-Box',
 };
 
-export default function CartPage({ cart, setPage, onRemoveFromCart, onClearCart }: CartPageProps) {
+export default function CartPage({ cart, setPage, onRemoveFromCart, onClearCart, onCheckout }: CartPageProps) {
   const calculateCartTotal = () => {
     return cart.reduce((sum, box) => sum + box.totalPrice, 0);
   };
@@ -37,24 +47,17 @@ export default function CartPage({ cart, setPage, onRemoveFromCart, onClearCart 
     if (cart.length === 0) return;
 
     // Create order object
-    const order = {
+    const order: Order = {
       orderId: `ORD-${Date.now()}`,
       timestamp: new Date().toISOString(),
-      customerEmail: '', // Can be added later if you want to collect email
-      boxes: cart.map(box => ({
-        type: box.type,
-        items: box.items,
-        totalPrice: box.totalPrice
-      })),
+      boxes: cart,
       totalAmount: calculateCartTotal(),
       tax: calculateCartTotal() * 0.08,
       grandTotal: calculateCartTotal() * 1.08
     };
 
-    // Save to localStorage
-    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    existingOrders.push(order);
-    localStorage.setItem('orders', JSON.stringify(existingOrders));
+    // Save order to user profile via onCheckout
+    onCheckout(order);
 
     // Clear cart
     onClearCart();

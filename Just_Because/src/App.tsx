@@ -10,6 +10,27 @@ import BackgroundSlideshow from './BackgroundSlideshow';
 
 interface User {
   username: string;
+  email: string;
+  surveyResponses?: SurveyResponses;
+  orderHistory: Order[];
+  createdAt: string;
+}
+
+interface SurveyResponses {
+  style: string;
+  productTypes: string[];
+  interests: string[];
+  priceRange: string;
+  occasion: string;
+}
+
+interface Order {
+  orderId: string;
+  timestamp: string;
+  boxes: CustomBox[];
+  totalAmount: number;
+  tax: number;
+  grandTotal: number;
 }
 
 interface SurveyEntry {
@@ -70,7 +91,7 @@ export default function App() {
   const [selectedBoxType, setSelectedBoxType] = useState<string>('');
   const [adminToken, setAdminToken] = useState<string>('');
 
-  // Check for admin token in URL on mount
+  // Check for admin token in URL on mount and load user session
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('admin');
@@ -78,17 +99,68 @@ export default function App() {
       setAdminToken(token);
       setPage('admin');
     }
+
+    // Load user from localStorage if exists
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
   }, []);
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const username = (form.elements.namedItem('username') as HTMLInputElement).value;
-    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
-    if (username && password) {
-      setUser({ username });
-      setPage('home');
+  // Save user to localStorage whenever it changes
+  React.useEffect(() => {
+    if (user) {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('currentUser');
     }
+  }, [user]);
+
+  const handleLogin = (username: string, password: string): boolean => {
+    // Get users from localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+    if (users[username] && users[username].password === password) {
+      const userData = users[username];
+      setUser({
+        username: userData.username,
+        email: userData.email,
+        surveyResponses: userData.surveyResponses,
+        orderHistory: userData.orderHistory || [],
+        createdAt: userData.createdAt
+      });
+      setPage('home');
+      return true;
+    }
+    return false;
+  };
+
+  const handleSignup = (username: string, email: string, password: string): boolean => {
+    // Get users from localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+    // Check if username already exists
+    if (users[username]) {
+      return false;
+    }
+
+    // Create new user
+    const newUser: User = {
+      username,
+      email,
+      orderHistory: [],
+      createdAt: new Date().toISOString()
+    };
+
+    users[username] = {
+      ...newUser,
+      password
+    };
+
+    localStorage.setItem('users', JSON.stringify(users));
+    setUser(newUser);
+    setPage('survey'); // Redirect to survey after signup
+    return true;
   };
 
   const handleLogout = () => {
@@ -96,14 +168,27 @@ export default function App() {
     setPage('login');
   };
 
-  const handleSurveySubmit = (e: React.FormEvent<HTMLFormElement>, setNotification: (message: string) => void) => {
-    const form = new FormData(e.target as HTMLFormElement);
-    const data = Object.fromEntries(form.entries()) as Omit<SurveyEntry, 'id'>;
-    const newEntry: SurveyEntry = { ...data, id: Date.now() }; // Add unique ID
-    setSurveyData((prev) => [...prev, newEntry]);
-    setNotification('Thank you for submitting the survey!');
-    setTimeout(() => setNotification(''), 3000); // Clear notification after 3 seconds
-    setPage('home'); // Navigate to home page after survey submission
+  const handleSurveySubmit = (surveyResponses: SurveyResponses) => {
+    if (!user) return;
+
+    // Update user with survey responses
+    const updatedUser = {
+      ...user,
+      surveyResponses
+    };
+    setUser(updatedUser);
+
+    // Update in localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    if (users[user.username]) {
+      users[user.username] = {
+        ...users[user.username],
+        surveyResponses
+      };
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    setPage('home');
   };
 
   const handleSelectBox = (boxType: string) => {
@@ -123,23 +208,44 @@ export default function App() {
     setCart([]);
   };
 
+  const handleCheckout = (order: Order) => {
+    if (!user) return;
+
+    // Update user with new order
+    const updatedUser = {
+      ...user,
+      orderHistory: [...user.orderHistory, order]
+    };
+    setUser(updatedUser);
+
+    // Update in localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    if (users[user.username]) {
+      users[user.username] = {
+        ...users[user.username],
+        orderHistory: updatedUser.orderHistory
+      };
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+  };
+
   return (
     <>
-      {page !== 'home' && page !== 'customize' && page !== 'cart' && page !== 'admin' && <BackgroundSlideshow images={slideshowImages} />}
+      {page !== 'home' && page !== 'customize' && page !== 'cart' && page !== 'admin' && page !== 'profile' && <BackgroundSlideshow images={slideshowImages} />}
       {(() => {
         switch (page) {
           case 'welcome':
             return <WelcomePage setPage={setPage} />;
           case 'login':
-            return <LoginPage handleLogin={handleLogin} />;
+            return <LoginPage handleLogin={handleLogin} handleSignup={handleSignup} />;
           case 'home':
-            return <HomePage setPage={setPage} onSelectBox={handleSelectBox} cartCount={cart.length} />;
+            return <HomePage setPage={setPage} onSelectBox={handleSelectBox} cartCount={cart.length} user={user} onLogout={handleLogout} />;
           case 'customize':
-            return <BoxCustomizationPage boxType={selectedBoxType} setPage={setPage} onAddToCart={handleAddToCart} />;
+            return <BoxCustomizationPage boxType={selectedBoxType} setPage={setPage} onAddToCart={handleAddToCart} userSurvey={user?.surveyResponses} />;
           case 'cart':
-            return <CartPage cart={cart} setPage={setPage} onRemoveFromCart={handleRemoveFromCart} onClearCart={handleClearCart} />;
+            return <CartPage cart={cart} setPage={setPage} onRemoveFromCart={handleRemoveFromCart} onClearCart={handleClearCart} onCheckout={handleCheckout} />;
           case 'survey':
-            return <SurveyPage handleSurveySubmit={handleSurveySubmit} surveyData={surveyData} setPage={setPage} />;
+            return <SurveyPage handleSurveySubmit={handleSurveySubmit} setPage={setPage} />;
           case 'admin':
             return <AdminPage setPage={setPage} adminToken={adminToken} />;
           default:
