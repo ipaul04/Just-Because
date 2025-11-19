@@ -5,6 +5,7 @@ import SurveyPage from './SurveyPage';
 import WelcomePage from './WelcomePage';
 import BoxCustomizationPage from './BoxCustomizationPage';
 import CartPage from './CartPage';
+import CheckoutPage from './CheckoutPage';
 import AdminPage from './AdminPage';
 import ProfilePage from './ProfilePage';
 import AboutPage from './AboutPage';
@@ -268,7 +269,7 @@ export default function App() {
 
   return (
     <>
-      {page !== 'home' && page !== 'customize' && page !== 'cart' && page !== 'admin' && page !== 'profile' && page !== 'about' && page !== 'recommendations' && <BackgroundSlideshow images={slideshowImages} />}
+      {page !== 'home' && page !== 'customize' && page !== 'cart' && page !== 'checkout' && page !== 'admin' && page !== 'profile' && page !== 'about' && page !== 'recommendations' && <BackgroundSlideshow images={slideshowImages} />}
       {(() => {
         switch (page) {
           case 'welcome':
@@ -280,7 +281,9 @@ export default function App() {
           case 'customize':
             return <BoxCustomizationPage boxType={selectedBoxType} setPage={setPage} onAddToCart={handleAddToCart} userSurvey={user?.surveyResponses} />;
           case 'cart':
-            return <CartPage cart={cart} setPage={setPage} onRemoveFromCart={handleRemoveFromCart} onClearCart={handleClearCart} onCheckout={handleCheckout} isLoggedIn={!!user} />;
+            return <CartPage cart={cart} setPage={setPage} onRemoveFromCart={handleRemoveFromCart} isLoggedIn={!!user} />;
+          case 'checkout':
+            return <CheckoutPage cart={cart} setPage={setPage} onClearCart={handleClearCart} onCheckout={handleCheckout} userEmail={user?.email} username={user?.username} />;
           case 'survey':
             return <SurveyPage handleSurveySubmit={handleSurveySubmit} setPage={setPage} />;
           case 'profile':

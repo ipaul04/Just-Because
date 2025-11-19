@@ -28,8 +28,6 @@ interface CartPageProps {
   cart: CustomBox[];
   setPage: (pageName: string) => void;
   onRemoveFromCart: (boxId: number) => void;
-  onClearCart: () => void;
-  onCheckout: (order: Order) => void;
   isLoggedIn: boolean;
 }
 
@@ -39,7 +37,7 @@ const boxTitles: Record<string, string> = {
   'build-a-box': 'Build-A-Box',
 };
 
-export default function CartPage({ cart, setPage, onRemoveFromCart, onClearCart, onCheckout, isLoggedIn }: CartPageProps) {
+export default function CartPage({ cart, setPage, onRemoveFromCart, isLoggedIn }: CartPageProps) {
   const calculateCartTotal = () => {
     return cart.reduce((sum, box) => sum + box.totalPrice, 0);
   };
@@ -54,25 +52,8 @@ export default function CartPage({ cart, setPage, onRemoveFromCart, onClearCart,
       return;
     }
 
-    // Create order object
-    const order: Order = {
-      orderId: `ORD-${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      boxes: cart,
-      totalAmount: calculateCartTotal(),
-      tax: calculateCartTotal() * 0.08,
-      grandTotal: calculateCartTotal() * 1.08
-    };
-
-    // Save order to user profile via onCheckout
-    onCheckout(order);
-
-    // Clear cart
-    onClearCart();
-
-    // Show success message and redirect
-    alert(`Order placed successfully!\n\nOrder ID: ${order.orderId}\nTotal: $${order.grandTotal.toFixed(2)}\n\nThank you for your purchase!`);
-    setPage('home');
+    // Navigate to checkout page
+    setPage('checkout');
   };
 
   return (
