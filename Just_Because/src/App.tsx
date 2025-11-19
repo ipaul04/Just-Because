@@ -6,6 +6,9 @@ import WelcomePage from './WelcomePage';
 import BoxCustomizationPage from './BoxCustomizationPage';
 import CartPage from './CartPage';
 import AdminPage from './AdminPage';
+import ProfilePage from './ProfilePage';
+import AboutPage from './AboutPage';
+import RecommendationsPage from './RecommendationsPage';
 import BackgroundSlideshow from './BackgroundSlideshow';
 
 interface User {
@@ -14,6 +17,7 @@ interface User {
   surveyResponses?: SurveyResponses;
   orderHistory: Order[];
   createdAt: string;
+  profilePicture?: string;
 }
 
 interface SurveyResponses {
@@ -188,7 +192,8 @@ export default function App() {
       localStorage.setItem('users', JSON.stringify(users));
     }
 
-    setPage('home');
+    // Redirect to recommendations page
+    setPage('recommendations');
   };
 
   const handleSelectBox = (boxType: string) => {
@@ -229,9 +234,41 @@ export default function App() {
     }
   };
 
+  const handleUpdateUser = (updates: Partial<User>) => {
+    if (!user) return;
+
+    const updatedUser = {
+      ...user,
+      ...updates
+    };
+    setUser(updatedUser);
+
+    // Update in localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    if (users[user.username]) {
+      users[user.username] = {
+        ...users[user.username],
+        ...updates
+      };
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+  };
+
+  const handleChangePassword = (currentPassword: string, newPassword: string): boolean => {
+    if (!user) return false;
+
+    const users = JSON.parse(localStorage.getItem('users') || '{}');
+    if (users[user.username] && users[user.username].password === currentPassword) {
+      users[user.username].password = newPassword;
+      localStorage.setItem('users', JSON.stringify(users));
+      return true;
+    }
+    return false;
+  };
+
   return (
     <>
-      {page !== 'home' && page !== 'customize' && page !== 'cart' && page !== 'admin' && page !== 'profile' && <BackgroundSlideshow images={slideshowImages} />}
+      {page !== 'home' && page !== 'customize' && page !== 'cart' && page !== 'admin' && page !== 'profile' && page !== 'about' && page !== 'recommendations' && <BackgroundSlideshow images={slideshowImages} />}
       {(() => {
         switch (page) {
           case 'welcome':
@@ -243,9 +280,15 @@ export default function App() {
           case 'customize':
             return <BoxCustomizationPage boxType={selectedBoxType} setPage={setPage} onAddToCart={handleAddToCart} userSurvey={user?.surveyResponses} />;
           case 'cart':
-            return <CartPage cart={cart} setPage={setPage} onRemoveFromCart={handleRemoveFromCart} onClearCart={handleClearCart} onCheckout={handleCheckout} />;
+            return <CartPage cart={cart} setPage={setPage} onRemoveFromCart={handleRemoveFromCart} onClearCart={handleClearCart} onCheckout={handleCheckout} isLoggedIn={!!user} />;
           case 'survey':
             return <SurveyPage handleSurveySubmit={handleSurveySubmit} setPage={setPage} />;
+          case 'profile':
+            return user ? <ProfilePage user={user} setPage={setPage} onUpdateUser={handleUpdateUser} onChangePassword={handleChangePassword} /> : <LoginPage handleLogin={handleLogin} handleSignup={handleSignup} />;
+          case 'about':
+            return <AboutPage setPage={setPage} />;
+          case 'recommendations':
+            return user?.surveyResponses ? <RecommendationsPage surveyResponses={user.surveyResponses} setPage={setPage} onSelectBox={handleSelectBox} /> : <SurveyPage handleSurveySubmit={handleSurveySubmit} setPage={setPage} />;
           case 'admin':
             return <AdminPage setPage={setPage} adminToken={adminToken} />;
           default:

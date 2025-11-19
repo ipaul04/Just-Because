@@ -30,6 +30,7 @@ interface CartPageProps {
   onRemoveFromCart: (boxId: number) => void;
   onClearCart: () => void;
   onCheckout: (order: Order) => void;
+  isLoggedIn: boolean;
 }
 
 const boxTitles: Record<string, string> = {
@@ -38,13 +39,20 @@ const boxTitles: Record<string, string> = {
   'build-a-box': 'Build-A-Box',
 };
 
-export default function CartPage({ cart, setPage, onRemoveFromCart, onClearCart, onCheckout }: CartPageProps) {
+export default function CartPage({ cart, setPage, onRemoveFromCart, onClearCart, onCheckout, isLoggedIn }: CartPageProps) {
   const calculateCartTotal = () => {
     return cart.reduce((sum, box) => sum + box.totalPrice, 0);
   };
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
+
+    // Require login to checkout
+    if (!isLoggedIn) {
+      alert('Please login or create an account to complete your purchase.');
+      setPage('login');
+      return;
+    }
 
     // Create order object
     const order: Order = {
@@ -93,6 +101,15 @@ export default function CartPage({ cart, setPage, onRemoveFromCart, onClearCart,
         className="max-w-6xl mx-auto p-8"
       >
         <h1 className="text-4xl font-bold mb-8 text-gray-800">Your Shopping Cart</h1>
+
+        {!isLoggedIn && cart.length > 0 && (
+          <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-300 rounded-xl">
+            <p className="text-yellow-800 font-semibold flex items-center">
+              <span className="mr-2">ℹ️</span>
+              Please login or create an account to complete your purchase.
+            </p>
+          </div>
+        )}
 
         {cart.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-xl p-12 text-center">

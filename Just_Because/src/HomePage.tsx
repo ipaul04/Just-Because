@@ -33,6 +33,22 @@ export default function HomePage({ setPage, onSelectBox, cartCount, user, onLogo
             <h1 className="text-2xl font-bold text-gray-800">Just Because</h1>
           </div>
           <div className="flex items-center space-x-6">
+            <button
+              onClick={() => setPage('about')}
+              className="text-gray-700 hover:text-pink-500 font-semibold transition"
+            >
+              About
+            </button>
+
+            {user && user.surveyResponses && (
+              <button
+                onClick={() => setPage('recommendations')}
+                className="text-gray-700 hover:text-pink-500 font-semibold transition"
+              >
+                Recommendations
+              </button>
+            )}
+
             {user && !user.surveyResponses && (
               <button
                 onClick={() => setPage('survey')}
@@ -41,6 +57,7 @@ export default function HomePage({ setPage, onSelectBox, cartCount, user, onLogo
                 Take Survey
               </button>
             )}
+
             <button
               onClick={() => setPage('cart')}
               className="text-gray-700 hover:text-pink-500 font-semibold transition relative"
@@ -52,11 +69,15 @@ export default function HomePage({ setPage, onSelectBox, cartCount, user, onLogo
                 </span>
               )}
             </button>
+
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-gray-700 font-semibold">
-                  Welcome, {user.username}!
-                </span>
+                <button
+                  onClick={() => setPage('profile')}
+                  className="text-gray-700 hover:text-pink-500 font-semibold transition"
+                >
+                  Profile
+                </button>
                 <button
                   onClick={onLogout}
                   className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg font-semibold transition"
