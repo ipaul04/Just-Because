@@ -35,9 +35,9 @@ const boxDefaults: Record<string, BoxItem[]> = {
     { id: 1, name: 'Scented Candle', price: 12.99, included: true },
     { id: 2, name: 'Luxurious Bath Bombs', price: 15.99, included: true },
     { id: 3, name: 'Silk Sleep Mask', price: 8.99, included: true },
-    { id: 4, name: 'Rose Gold Bracelet', price: 24.99, included: true },
-    { id: 5, name: 'Premium Chocolate Truffles', price: 18.99, included: true },
-    { id: 6, name: 'Aromatherapy Essential Oil Set', price: 22.99, included: true },
+    { id: 4, name: 'Rose Gold Bracelet', price: 24.99, included: false },
+    { id: 5, name: 'Premium Chocolate Truffles', price: 18.99, included: false },
+    { id: 6, name: 'Aromatherapy Essential Oil Set', price: 22.99, included: false },
     { id: 7, name: 'Personalized Journal', price: 14.99, included: false },
     { id: 8, name: 'Floral Tea Collection', price: 16.99, included: false },
   ],
@@ -45,8 +45,8 @@ const boxDefaults: Record<string, BoxItem[]> = {
     { id: 1, name: 'Premium Leather Wallet', price: 29.99, included: true },
     { id: 2, name: 'Artisan Coffee Blend', price: 18.99, included: true },
     { id: 3, name: 'Grooming Kit', price: 24.99, included: true },
-    { id: 4, name: 'Stainless Steel Watch', price: 45.99, included: true },
-    { id: 5, name: 'Gourmet Beef Jerky', price: 15.99, included: true },
+    { id: 4, name: 'Stainless Steel Watch', price: 45.99, included: false },
+    { id: 5, name: 'Gourmet Beef Jerky', price: 15.99, included: false },
     { id: 6, name: 'Wireless Earbuds', price: 39.99, included: false },
     { id: 7, name: 'Craft Beer Selection', price: 22.99, included: false },
     { id: 8, name: 'Tech Organizer Pouch', price: 19.99, included: false },
@@ -115,6 +115,7 @@ const boxColors: Record<string, {
 
 export default function BoxCustomizationPage({ boxType, setPage, onAddToCart, userSurvey }: BoxCustomizationPageProps) {
   const [items, setItems] = useState<BoxItem[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     // Initialize items based on box type
@@ -122,6 +123,7 @@ export default function BoxCustomizationPage({ boxType, setPage, onAddToCart, us
   }, [boxType]);
 
   const toggleItem = (itemId: number) => {
+    setErrorMessage(''); // Clear error when user makes changes
     setItems(items.map(item =>
       item.id === itemId ? { ...item, included: !item.included } : item
     ));
@@ -129,6 +131,7 @@ export default function BoxCustomizationPage({ boxType, setPage, onAddToCart, us
 
   const BASE_PRICE = 49.99;
   const BASE_ITEMS = 3;
+  const MIN_ITEMS = 3;
 
   const calculateTotal = () => {
     const includedItems = items.filter(item => item.included);
@@ -192,10 +195,18 @@ export default function BoxCustomizationPage({ boxType, setPage, onAddToCart, us
   };
 
   const handleAddToCart = () => {
+    const includedItems = items.filter(item => item.included);
+
+    // Validate minimum items
+    if (includedItems.length < MIN_ITEMS) {
+      setErrorMessage(`Please select at least ${MIN_ITEMS} items to create your box.`);
+      return;
+    }
+
     const customBox: CustomBox = {
       id: Date.now(),
       type: boxType,
-      items: items.filter(item => item.included),
+      items: includedItems,
       totalPrice: calculateTotal(),
     };
     onAddToCart(customBox);
@@ -249,12 +260,23 @@ export default function BoxCustomizationPage({ boxType, setPage, onAddToCart, us
             </div>
           )}
 
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-xl">
+              <p className="text-red-700 font-semibold flex items-center">
+                <span className="mr-2">⚠️</span>
+                {errorMessage}
+              </p>
+            </div>
+          )}
+
           {/* Summary Bar */}
           <div className={`${color.bgGradient} rounded-xl p-4 mb-6`}>
             <div className="flex justify-between items-center">
               <div>
-                <span className="text-gray-700 font-semibold">
+                <span className={`font-semibold ${includedCount < MIN_ITEMS ? 'text-red-600' : 'text-gray-700'}`}>
                   {includedCount} item{includedCount !== 1 ? 's' : ''} selected
+                  {includedCount < MIN_ITEMS && ` (minimum ${MIN_ITEMS} required)`}
                 </span>
                 {includedCount <= BASE_ITEMS ? (
                   <p className="text-sm text-gray-600 mt-1">
@@ -320,13 +342,14 @@ export default function BoxCustomizationPage({ boxType, setPage, onAddToCart, us
           {/* Action Buttons */}
           <div className="flex space-x-4">
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: includedCount >= MIN_ITEMS ? 1.05 : 1 }}
+              whileTap={{ scale: includedCount >= MIN_ITEMS ? 0.95 : 1 }}
               onClick={handleAddToCart}
-              disabled={includedCount === 0}
+              disabled={includedCount < MIN_ITEMS}
               className={`flex-1 ${color.buttonClass} ${color.buttonHoverClass} text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               Add to Cart ({includedCount} item{includedCount !== 1 ? 's' : ''})
+              {includedCount < MIN_ITEMS && ` - Need ${MIN_ITEMS - includedCount} more`}
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
