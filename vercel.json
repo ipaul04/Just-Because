@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd Just_Because && npm install && npm run build",
+  "outputDirectory": "Just_Because/build",
+  "installCommand": "cd Just_Because && npm install",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
