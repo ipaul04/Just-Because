@@ -14,28 +14,28 @@ interface BoardMember {
 const boardMembers: BoardMember[] = [
   {
     name: 'Aedan Hannigan',
-    title: 'CEO and CFO',
-    image: '/carousell/aedan.jpg'
+    title: 'CEO and CFO - Chief Executive Officer and Chief Financial Officer',
+    image: '/carousell/Aedan.jpg'
   },
   {
     name: 'Jack Ehrlich',
-    title: 'COO',
-    image: '/carousell/jack.jpg'
+    title: 'COO - Chief Operating Officer',
+    image: '/carousell/jack.JPEG'
   },
   {
     name: 'Irene Paul',
-    title: 'CTO',
-    image: '/carousell/irene.jpg'
+    title: 'CTO - Chief Technology Officer',
+    image: '/carousell/Irene.png'
   },
   {
     name: 'Conor Marquez',
-    title: 'CPO',
-    image: '/carousell/conor.jpg'
+    title: 'CPO - Chief Product Officer',
+    image: '/carousell/conor.jpeg'
   },
   {
     name: 'Regina Azimzadeh',
-    title: 'CMO',
-    image: '/carousell/regina.jpg'
+    title: 'CMO - Chief Marketing Officer',
+    image: '/carousell/regina.JPG'
   }
 ];
 
