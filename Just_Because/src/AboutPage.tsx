@@ -5,7 +5,44 @@ interface AboutPageProps {
   setPage: (pageName: string) => void;
 }
 
+interface BoardMember {
+  name: string;
+  title: string;
+  image: string;
+}
+
+const boardMembers: BoardMember[] = [
+  {
+    name: 'Aedan Hannigan',
+    title: 'CEO and CFO',
+    image: '/carousell/aedan.jpg'
+  },
+  {
+    name: 'Jack Ehrlich',
+    title: 'COO',
+    image: '/carousell/jack.jpg'
+  },
+  {
+    name: 'Irene Paul',
+    title: 'CTO',
+    image: '/carousell/irene.jpg'
+  },
+  {
+    name: 'Conor Marquez',
+    title: 'CPO',
+    image: '/carousell/conor.jpg'
+  },
+  {
+    name: 'Regina Azimzadeh',
+    title: 'CMO',
+    image: '/carousell/regina.jpg'
+  }
+];
+
 export default function AboutPage({ setPage }: AboutPageProps) {
+  // Duplicate the array to create seamless loop
+  const duplicatedMembers = [...boardMembers, ...boardMembers];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-pink-100">
       {/* Navigation Bar */}
@@ -29,7 +66,7 @@ export default function AboutPage({ setPage }: AboutPageProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="max-w-4xl mx-auto p-8"
+        className="max-w-6xl mx-auto p-8"
       >
         {/* Hero Section */}
         <div className="bg-white rounded-2xl shadow-2xl p-12 mb-8 text-center">
@@ -54,94 +91,83 @@ export default function AboutPage({ setPage }: AboutPageProps) {
         {/* Mission Section */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-            <span className="mr-3">🌟</span>
+            <span className="mr-3">🎯</span>
             Our Mission
           </h2>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            At <span className="font-semibold text-pink-600">Just Because</span>, we believe that the best gifts
-            don't need a reason. Sometimes, the most meaningful gestures are the ones that happen "just because"
-            you care, "just because" you're thinking of someone, or "just because" you want to bring a smile to
-            someone's face.
-          </p>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            Our mission is to make thoughtful gifting effortless and personal. We curate beautiful, high-quality
-            products and combine them into customizable gift boxes that speak from the heart. Whether you're
-            celebrating a milestone or simply brightening someone's day, we're here to help you create moments
-            of joy and connection.
+          <p className="text-xl text-gray-700 leading-relaxed">
+            To deliver quality gifts and create thoughtful experiences that keep sparks flying.
           </p>
         </div>
 
-        {/* Values Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="bg-white rounded-2xl shadow-xl p-6"
-          >
-            <div className="text-4xl mb-4">🎁</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Thoughtful Curation</h3>
-            <p className="text-gray-600">
-              Every item in our boxes is carefully selected for quality, beauty, and the joy it brings. We
-              partner with artisans and trusted brands to bring you products that matter.
-            </p>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="bg-white rounded-2xl shadow-xl p-6"
-          >
-            <div className="text-4xl mb-4">✨</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Personalization</h3>
-            <p className="text-gray-600">
-              Your gift should be as unique as the person receiving it. Our survey-based recommendations and
-              customization options ensure every box feels personal and special.
-            </p>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="bg-white rounded-2xl shadow-xl p-6"
-          >
-            <div className="text-4xl mb-4">💖</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Connection</h3>
-            <p className="text-gray-600">
-              We believe gifts are bridges between hearts. Whether near or far, our boxes help you express
-              love, gratitude, and appreciation in meaningful ways.
-            </p>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="bg-white rounded-2xl shadow-xl p-6"
-          >
-            <div className="text-4xl mb-4">🌈</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Joy & Delight</h3>
-            <p className="text-gray-600">
-              From the moment you start customizing to the smile on your recipient's face, we're committed
-              to making every step of the gifting journey delightful.
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Story Section */}
-        <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl shadow-xl p-8 mb-8">
+        {/* Vision Section */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-            <span className="mr-3">📖</span>
-            Our Story
+            <span className="mr-3">✨</span>
+            Our Vision
           </h2>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            Just Because was born from a simple observation: some of life's most treasured moments aren't
-            tied to holidays or special occasions. They're the everyday acts of kindness, the spontaneous
-            expressions of love, and the thoughtful gestures that remind us we're valued.
+          <p className="text-xl text-gray-700 leading-relaxed">
+            To inspire meaningful moments that bring people together, and remind us to celebrate life's simple joys - just because.
           </p>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4">
-            We started with a vision to create a gifting experience that celebrates these authentic moments.
-            By combining carefully curated products with personalized recommendations, we've built a platform
-            that makes it easy to show someone you care—just because.
-          </p>
-          <p className="text-lg text-gray-700 leading-relaxed">
-            Today, we're proud to help thousands of people create meaningful connections through thoughtful,
-            personalized gifts. Every box we send carries with it a piece of that original vision: to
-            celebrate the beautiful, ordinary, extraordinary moments that make life special.
+        </div>
+
+        {/* Board Members Carousel */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 overflow-hidden">
+          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center flex items-center justify-center">
+            <span className="mr-3">👥</span>
+            Our Leadership Team
+          </h2>
+
+          {/* Carousel Container */}
+          <div className="relative h-80 overflow-hidden">
+            <style>{`
+              @keyframes scroll-left {
+                0% {
+                  transform: translateX(0);
+                }
+                100% {
+                  transform: translateX(-50%);
+                }
+              }
+              .carousel-track {
+                animation: scroll-left 20s linear infinite;
+              }
+              .carousel-track:hover {
+                animation-play-state: paused;
+              }
+            `}</style>
+
+            <div className="carousel-track flex gap-6 absolute left-0">
+              {duplicatedMembers.map((member, index) => (
+                <motion.div
+                  key={`${member.name}-${index}`}
+                  whileHover={{ scale: 1.05 }}
+                  className="min-w-[280px] bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl shadow-lg p-6 flex flex-col items-center"
+                >
+                  <div className="w-40 h-40 rounded-full overflow-hidden mb-4 border-4 border-pink-300 shadow-xl">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to placeholder if image doesn't load
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="160" height="160"%3E%3Crect width="160" height="160" fill="%23e2e8f0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="%23cbd5e0"%3E' + member.name.charAt(0) + '%3C/text%3E%3C/svg%3E';
+                      }}
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800 text-center mb-2">
+                    {member.name}
+                  </h3>
+                  <p className="text-md font-semibold text-pink-600 text-center">
+                    {member.title}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-center text-sm text-gray-500 mt-6 italic">
+            Hover over a card to pause the carousel
           </p>
         </div>
 
