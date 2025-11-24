@@ -19,7 +19,7 @@ const boardMembers: BoardMember[] = [
   },
   {
     name: 'Jack Ehrlich',
-    title: 'COO - Chief Operating Officer',
+    title: 'CFO - Chief Financial Officer',
     image: '/carousell/jack.JPEG'
   },
   {
